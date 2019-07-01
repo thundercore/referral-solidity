@@ -22,6 +22,8 @@ contract Referral is Ownable {
   }
 
   event RegisterReferer(address referee, address referrer);
+  // pay event
+  // update time event
 
   mapping(address => Account) accounts;
 
@@ -38,7 +40,7 @@ contract Referral is Ownable {
     uint _decimals,
     uint _secondsUntilInactive,
     bool _onlyRewardActiveReferrers,
-    uint256[2][] memory _refereeBonusRateMap
+    uint256[] memory _refereeBonusRateMap
   )
     public
   {
@@ -55,8 +57,8 @@ contract Referral is Ownable {
     onlyRewardActiveReferrers = _onlyRewardActiveReferrers;
 
     // Cause we can't pass struct or nested array without enabling experimental ABIEncoderV2, use array to simulate it
-    for (uint i; i < _refereeBonusRateMap.length; i++) {
-      refereeBonusRateMap[i] = RefereeBonusRate(_refereeBonusRateMap[i][0], _refereeBonusRateMap[i][1]);
+    for (uint i; i < _refereeBonusRateMap.length; i += 2) {
+      refereeBonusRateMap[i] = RefereeBonusRate(_refereeBonusRateMap[i], _refereeBonusRateMap[i+1]);
     }
   }
 
