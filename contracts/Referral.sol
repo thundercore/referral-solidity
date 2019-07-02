@@ -113,9 +113,9 @@ contract Referral is Ownable {
       Account storage parentAccount = accounts[userAccount.referrer];
 
       if(onlyRewardActiveReferrers && parentAccount.lastActiveTimestamp.add(secondsUntilInactive) >= getTime() || !onlyRewardActiveReferrers) {
-        uint c = value.mul(referralBonus).div(decimals)
-          .mul(levelRate[i]).div(decimals)
-          .mul(getRefereeBonusRate(parentAccount.referredCount)).div(decimals);
+        uint c = value.mul(referralBonus).div(decimals);
+        c = c.mul(levelRate[i]).div(decimals);
+        c = c.mul(getRefereeBonusRate(parentAccount.referredCount)).div(decimals);
 
         totalReferal = totalReferal.add(c);
 

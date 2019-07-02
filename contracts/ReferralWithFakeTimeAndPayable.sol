@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./Referral.sol";
 
-contract ReferralWithFakeTime is Referral {
+contract ReferralWithFakeTimeAndPayable is Referral {
   uint256 fakeTime;
 
   constructor(
@@ -24,5 +24,9 @@ contract ReferralWithFakeTime is Referral {
 
   function setTime(uint256 f) public {
     fakeTime = f;
+  }
+
+  function play () public payable {
+    payReferral(msg.value);
   }
 }

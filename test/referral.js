@@ -6,7 +6,7 @@ const {
   constants: helperConstants
 } = require("openzeppelin-test-helpers");
 const { expect } = require("chai");
-const ReferralWithFakeTime = artifacts.require("ReferralWithFakeTime");
+const Referral = artifacts.require("ReferralWithFakeTimeAndPayable");
 
 const { constants, events, errors } = require("./constants");
 
@@ -21,7 +21,7 @@ contract("Referral", function(accounts) {
   describe("Init", function() {
     it("Should failed to deploy when levels is empty", async () => {
       await expectRevert(
-        ReferralWithFakeTime.new(
+        Referral.new(
           [],
           referralBonus,
           decimals,
@@ -35,7 +35,7 @@ contract("Referral", function(accounts) {
 
     it("Should failed to deploy when levels are too much", async () => {
       await expectRevert(
-        ReferralWithFakeTime.new(
+        Referral.new(
           [new BN(4000), new BN(3000), new BN(2000), new BN(1000)],
           referralBonus,
           decimals,
@@ -49,7 +49,7 @@ contract("Referral", function(accounts) {
 
     it("Should failed when total level rate is larger than 100%", async () => {
       await expectRevert(
-        ReferralWithFakeTime.new(
+        Referral.new(
           [new BN(4000), new BN(4000), new BN(4000)],
           referralBonus,
           decimals,
@@ -63,7 +63,7 @@ contract("Referral", function(accounts) {
 
     it("Should failed when Referral bonus is larger than 100%", async () => {
       await expectRevert(
-        ReferralWithFakeTime.new(
+        Referral.new(
           levelRate,
           decimals.mul(new BN(2)),
           decimals,
@@ -76,9 +76,9 @@ contract("Referral", function(accounts) {
     });
   });
 
-  describe('Add Referrer', function() {
-    it("Should success add referrer", async () => {
-      this.referral = await ReferralWithFakeTime.new(
+  describe("Add Referrer", function() {
+    beforeEach(async () => {
+      this.referral = await Referral.new(
         levelRate,
         referralBonus,
         decimals,
@@ -86,10 +86,13 @@ contract("Referral", function(accounts) {
         onlyRewardActiveReferrers,
         refereeBonusRateMap
       );
+    })
 
+    it("Should success add referrer", async () => {
       const result = await this.referral.addReferrer(accounts[0], {
         from: accounts[1]
       });
+
 
       expectEvent.inLogs(result.logs, events.registerReferer, {
         referee: accounts[1],
@@ -98,15 +101,6 @@ contract("Referral", function(accounts) {
     });
 
     it("Should failed when add address 0x0 as referrer", async () => {
-      this.referral = await ReferralWithFakeTime.new(
-        levelRate,
-        referralBonus,
-        decimals,
-        secondsUntilInactive,
-        onlyRewardActiveReferrers,
-        refereeBonusRateMap
-      );
-
       await expectRevert(
         this.referral.addReferrer(helperConstants.ZERO_ADDRESS, {
           from: accounts[1]
@@ -116,15 +110,6 @@ contract("Referral", function(accounts) {
     });
 
     it("Should failed when an address double add referrer", async () => {
-      this.referral = await ReferralWithFakeTime.new(
-        levelRate,
-        referralBonus,
-        decimals,
-        secondsUntilInactive,
-        onlyRewardActiveReferrers,
-        refereeBonusRateMap
-      );
-
       await this.referral.addReferrer(accounts[0], {
         from: accounts[1]
       });
@@ -137,4 +122,25 @@ contract("Referral", function(accounts) {
       );
     });
   });
+
+  // describe("Pay Referral", function() {
+  //   beforeEach(async () => {
+  //     this.referral = await Referral.new(
+  //       levelRate,
+  //       referralBonus,
+  //       decimals,
+  //       secondsUntilInactive,
+  //       onlyRewardActiveReferrers,
+  //       refereeBonusRateMap
+  //     );
+  //   })
+
+  //   it("Update", async () => {
+  //     await this.referral.addReferrer(accounts[0], {
+  //       from: accounts[1]
+  //     });
+
+  //     await this.referral.payReferral()
+  //   });
+  // });
 });
