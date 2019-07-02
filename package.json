@@ -17,6 +17,9 @@
     "truffle-hdwallet-provider": "^1.0.10"
   },
   "devDependencies": {
+    "big-integer": "^1.6.44",
+    "chai": "^4.2.0",
+    "openzeppelin-test-helpers": "^0.4.0",
     "solium": "^1.2.4"
   },
   "scripts": {
