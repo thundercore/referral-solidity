@@ -16,6 +16,9 @@
     "truffle": "^5.0.22",
     "truffle-hdwallet-provider": "^1.0.10"
   },
+  "devDependencies": {
+    "solium": "^1.2.4"
+  },
   "scripts": {
     "compile": "truffle compile",
     "compile:testnet": "truffle compile --network thunder-testnet",
@@ -24,6 +27,8 @@
     "migrate:testnet": "truffle migrate --network thunder-testnet",
     "migrate:mainnet": "truffle migrate --network thunder-mainnet",
     "test": "truffle test",
-    "clean": "rm -rf build/contracts"
+    "clean": "rm -rf build/contracts",
+    "lint": "solium -d contracts/",
+    "lint:fix": "solium -d contracts/ --fix"
   }
 }
