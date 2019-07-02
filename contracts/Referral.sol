@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract Referral is Ownable {
   using SafeMath for uint;
@@ -22,6 +22,7 @@ contract Referral is Ownable {
   }
 
   event RegisterReferer(address referee, address referrer);
+  event PayReferral(address to, uint amount, uint level);
   // pay event
   // update time event
 
@@ -44,11 +45,11 @@ contract Referral is Ownable {
   )
     public
   {
-    require (_levelRate.length <= MAX_REFER_DEPTH, 'Exceeded max referral level depth');
-    require(_refereeBonusRateMap.length % 2 == 0, 'Referee Bonus Rate Map should be pass as [<amount>, <rate>, ....]');
-    require(_refereeBonusRateMap.length / 2 <= MAX_REFEREE_BONUS_LEVEL, 'Exceeded max referree bonus level depth');
-    require (_referralBonus <= _decimals, 'Referral bonus is exceeded 100%');
-    require (sum(_levelRate) > _decimals, 'Sum of level rate exceeded 100%');
+    require (_levelRate.length <= MAX_REFER_DEPTH, "Exceeded max referral level depth");
+    require(_refereeBonusRateMap.length % 2 == 0, "Referee Bonus Rate Map should be pass as [<amount>, <rate>, ....]");
+    require(_refereeBonusRateMap.length / 2 <= MAX_REFEREE_BONUS_LEVEL, "Exceeded max referree bonus level depth");
+    require (_referralBonus <= _decimals, "Referral bonus is exceeded 100%");
+    require (sum(_levelRate) > _decimals, "Sum of level rate exceeded 100%");
 
     referralBonus = _referralBonus;
     decimals = _decimals;
@@ -65,14 +66,14 @@ contract Referral is Ownable {
   function sum(uint[] memory data) public pure returns (uint) {
     uint S;
     for(uint i;i < data.length;i++) {
-        S += data[i];
+      S += data[i];
     }
     return S;
   }
 
-  // function hasReferrer(address addr) private view returns(bool){
-  //   return accounts[addr].referrer != address(0);
-  // }
+  function hasReferrer(address addr) public view returns(bool){
+    return accounts[addr].referrer != address(0);
+  }
 
   function getTime() public view returns(uint256) {
     return now; // solium-disable-line security/no-block-members
@@ -87,8 +88,8 @@ contract Referral is Ownable {
   }
 
   function addReferrer(address payable referrer) public {
-    require(referrer != address(0), 'Referrer cannot be 0x0 address');
-    require(accounts[msg.sender].referrer == address(0), 'Address have been registered upline');
+    require(referrer != address(0), "Referrer cannot be 0x0 address");
+    require(accounts[msg.sender].referrer == address(0), "Address have been registered upline");
 
     Account storage userAccount = accounts[msg.sender];
     Account storage parentAccount = accounts[referrer];
@@ -100,24 +101,35 @@ contract Referral is Ownable {
     emit RegisterReferer(msg.sender, referrer);
   }
 
-  function payReferral(uint256 value) internal {
-    // TODO: active time
+  function payReferral(uint256 value) internal returns(uint256){
     Account memory userAccount = accounts[msg.sender];
+    uint totalReferal;
 
     for (uint i; i < levelRate.length; i++) {
       address payable parent = userAccount.referrer;
       Account storage parentAccount = accounts[userAccount.referrer];
 
-      uint c = value.mul(referralBonus).div(decimals)
-        .mul(levelRate[i]).div(decimals)
-        .mul(getRefereeBonusRate(parentAccount.referredCount)).div(decimals);
+      if(parentAccount.lastActiveTimestamp.add(secondsUntilInactive) >= getTime()) {
+        uint c = value.mul(referralBonus).div(decimals)
+          .mul(levelRate[i]).div(decimals)
+          .mul(getRefereeBonusRate(parentAccount.referredCount)).div(decimals);
 
-      parent.transfer(c);
+        totalReferal = totalReferal.add(c);
+
+        parent.transfer(c);
+        emit PayReferral(parent, c, i + 1);
+      }
 
       userAccount = parentAccount;
     }
 
     accounts[msg.sender].lastActiveTimestamp = getTime();
+    return totalReferal;
+  }
+
+  function updateActiveTimestamp(address user) internal {
+    Account storage userAccount = accounts[user];
+    userAccount.lastActiveTimestamp = getTime();
   }
 
   function setSecondsUntilInactive(uint _secondsUntilInactive) public onlyOwner {
