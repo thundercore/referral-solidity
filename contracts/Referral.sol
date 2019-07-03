@@ -21,9 +21,9 @@ contract Referral is Ownable {
     uint rate;
   }
 
-  event RegisterReferer(address referee, address referrer);
-  event PayReferral(address to, uint amount, uint level);
-  // update time event
+  event RegisteredReferer(address referee, address referrer);
+  event PaidReferral(address to, uint amount, uint level);
+  event UpdatedUserLastActiveTime(address user, uint timestamp);
 
   mapping(address => Account) public accounts;
 
@@ -101,7 +101,7 @@ contract Referral is Ownable {
     userAccount.lastActiveTimestamp = getTime();
     parentAccount.referredCount = parentAccount.referredCount.add(1);
 
-    emit RegisterReferer(msg.sender, referrer);
+    emit RegisteredReferer(msg.sender, referrer);
   }
 
   function payReferral(uint256 value) internal returns(uint256){
@@ -112,6 +112,10 @@ contract Referral is Ownable {
       address payable parent = userAccount.referrer;
       Account storage parentAccount = accounts[userAccount.referrer];
 
+      if (parent == address(0)) {
+        break;
+      }
+
       if(onlyRewardActiveReferrers && parentAccount.lastActiveTimestamp.add(secondsUntilInactive) >= getTime() || !onlyRewardActiveReferrers) {
         uint c = value.mul(referralBonus).div(decimals);
         c = c.mul(levelRate[i]).div(decimals);
@@ -120,7 +124,7 @@ contract Referral is Ownable {
         totalReferal = totalReferal.add(c);
 
         parent.transfer(c);
-        emit PayReferral(parent, c, i + 1);
+        emit PaidReferral(parent, c, i + 1);
       }
 
       userAccount = parentAccount;
@@ -133,6 +137,8 @@ contract Referral is Ownable {
   function updateActiveTimestamp(address user) internal {
     Account storage userAccount = accounts[user];
     userAccount.lastActiveTimestamp = getTime();
+
+    emit UpdatedUserLastActiveTime(user, userAccount.lastActiveTimestamp);
   }
 
   function setSecondsUntilInactive(uint _secondsUntilInactive) public onlyOwner {

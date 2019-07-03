@@ -26,7 +26,7 @@ contract ReferralWithFakeTimeAndPayable is Referral {
     fakeTime = f;
   }
 
-  function play () public payable {
-    payReferral(msg.value);
+  function play () public payable returns(uint256){
+    return payReferral(msg.value);
   }
 }

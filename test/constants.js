@@ -6,8 +6,9 @@ module.exports = {
     MAX_REFEREE_BONUS_LEVEL: new BN(3),
   },
   events: {
-    registerReferer: 'RegisterReferer',
-    payReferral: 'PayReferral',
+    registeredReferer: 'RegisteredReferer',
+    paidReferral: 'PaidReferral',
+    updatedUserLastActiveTime: 'UpdatedUserLastActiveTime'
   },
   errors: {
     MissLevelRate: 'Referral level should be at least one',
