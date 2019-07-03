@@ -1,5 +1,5 @@
 {
-  "name": "referral-contract",
+  "name": "referral-solidity",
   "version": "1.0.0",
   "description": "Solidity Referral Contract lib",
   "main": "index.js",
