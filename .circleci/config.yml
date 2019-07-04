@@ -26,7 +26,7 @@ jobs:
           command: npm install
       - run:
           name: install ganache
-          command: npm install -g ganache-cli
+          command: npm install ganache-cli
       - run:
           name: Run up local chain
           command: ganache-cli -p 9545
