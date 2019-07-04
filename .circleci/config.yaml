@@ -1,0 +1,29 @@
+##############
+# Executors #
+##############
+executors:
+  localtest:
+    docker:
+      - image: circleci/node:10.15.0 
+
+version: 2.1
+
+##############
+# workflows  #
+##############
+workflows:
+  build-deploy:
+    jobs:
+      - test
+
+jobs:
+  test:
+    executor: localtest
+    steps:
+      - checkout
+      - run:
+          name: install deps
+          command: npm install
+      - run:
+          name: run test 
+          command: npm test 
