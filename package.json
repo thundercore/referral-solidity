@@ -1,26 +1,32 @@
 {
-  "name": "referral-solidity",
-  "version": "1.0.0",
+  "name": "@thundercore/referral-solidity",
+  "version": "1.0.1",
   "description": "Solidity Referral Contract lib",
-  "main": "index.js",
+  "files": [
+    "build",
+    "contracts",
+    "!contracts/mocks",
+    "!contracts/examples"
+  ],
   "repository": "git@github.com:thundercore/referral-contract.git",
   "author": "Lucien Lee <lucien@thundertoken.tw>",
   "license": "MIT",
   "keywords": [
     "ethereum",
     "thundercore",
-    "smart contract"
+    "smart contract",
+    "solidity"
   ],
   "dependencies": {
-    "openzeppelin-solidity": "^2.3.0",
-    "truffle": "^5.0.22",
-    "truffle-hdwallet-provider": "^1.0.10"
+    "openzeppelin-solidity": "^2.3.0"
   },
   "devDependencies": {
     "big-integer": "^1.6.44",
     "chai": "^4.2.0",
     "openzeppelin-test-helpers": "^0.4.0",
-    "solium": "^1.2.4"
+    "solium": "^1.2.4",
+    "truffle": "^5.0.22",
+    "truffle-hdwallet-provider": "^1.0.10"
   },
   "scripts": {
     "compile": "truffle compile",
