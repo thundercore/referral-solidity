@@ -39,10 +39,10 @@ jobs:
           command: 'node_modules/.bin/mocha --reporter mocha-junit-reporter --reporter-options mochaFile=$MOCHA_FILE'
           environment:
             MOCHA_FILE: ./test_result/mocha/results.xml
-          - store_test_results:
-              path: $MOCHA_FILE
-          - store_artifacts:
-              path: $MOCHA_FILE 
+      - store_test_results:
+          path: $MOCHA_FILE
+      - store_artifacts:
+          path: $MOCHA_FILE 
       - slack/notify:
           color: '#42e2f4'
 #          mentions: 'USERID1,USERID2,'
