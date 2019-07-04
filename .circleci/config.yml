@@ -16,6 +16,9 @@ workflows:
     jobs:
       - test
 
+orbs:
+  slack: circleci/slack@3.2.0
+
 jobs:
   test:
     executor: localtest
@@ -26,11 +29,22 @@ jobs:
           command: npm install
       - run:
           name: install ganache
-          command: npm install ganache-cli
+          command: npm install ganache-cli mocha mocha-junit-reporter
       - run:
           name: Run up local chain
           command: npx ganache-cli -h 127.0.0.1 -p 9545
           background: true
       - run:
           name: run test
-          command: npm test
+          command: 'node_modules/.bin/mocha --reporter mocha-junit-reporter --reporter-options mochaFile=$MOCHA_FILE'
+          environment:
+            MOCHA_FILE: ./test_result/mocha/results.xml
+          - store_test_results:
+              path: $MOCHA_FILE
+          - store_artifacts:
+              path: $MOCHA_FILE 
+      - slack/notify:
+          color: '#42e2f4'
+#          mentions: 'USERID1,USERID2,'
+          message: This is a custom message notification
+#          webhook: webhook
