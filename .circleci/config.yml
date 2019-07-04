@@ -38,7 +38,9 @@ jobs:
           background: true
       - run:
           name: run test
-          command: node_modules/.bin/mocha --reporter mocha-junit-reporter --reporter-options mochaFile=$MOCHA_FILE
+          command: |
+            echo "export MOCHA_FILE=\"${MOCHA_FILE}\"" >> $BASH_ENV
+            node_modules/.bin/mocha --reporter mocha-junit-reporter --reporter-options mochaFile=$MOCHA_FILE
       - store_test_results:
           path: $MOCHA_FILE
       - store_artifacts:
