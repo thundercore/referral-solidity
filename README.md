@@ -19,7 +19,7 @@ To write your custom contracts, import ours and extend them through inheritance.
 
 ```solidity
 pragma solidity ^0.5.0;
-import 'referral-solidity/contracts/Referral.sol';
+import '@thundercore/referral-solidity/contracts/Referral.sol';
 
 contracts YourGame is Referral {
   constructor() Referral ([6000, 3000, 1000], 500, 10000, 24 * 60 * 60, true, [1, 10000]) public {
