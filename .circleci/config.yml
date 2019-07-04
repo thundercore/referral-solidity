@@ -4,7 +4,7 @@
 executors:
   localtest:
     docker:
-      - image: circleci/node:10.15.0 
+      - image: circleci/node:10.15.0
 
 version: 2.1
 
@@ -25,5 +25,11 @@ jobs:
           name: install deps
           command: npm install
       - run:
-          name: run test 
-          command: npm test 
+          name: install ganache
+          command: npm install -g ganache-cli
+      - run:
+          name: Run up local chain
+          command: ganache-cli -p 9545
+      - run:
+          name: run test
+          command: npm test
