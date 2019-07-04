@@ -29,7 +29,8 @@ jobs:
           command: npm install ganache-cli
       - run:
           name: Run up local chain
-          command: npx ganache-cli -p 9545 &
+          command: npx ganache-cli -p 9545
+          background: true
       - run:
           name: run test
           command: npm test
