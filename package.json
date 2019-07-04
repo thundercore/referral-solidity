@@ -1,15 +1,21 @@
 {
-  "name": "referral-solidity",
+  "name": "@thundercore/referral-solidity",
   "version": "1.0.0",
   "description": "Solidity Referral Contract lib",
-  "main": "index.js",
+  "files": [
+    "build",
+    "contracts",
+    "!contracts/mocks",
+    "!contracts/examples"
+  ],
   "repository": "git@github.com:thundercore/referral-contract.git",
   "author": "Lucien Lee <lucien@thundertoken.tw>",
   "license": "MIT",
   "keywords": [
     "ethereum",
     "thundercore",
-    "smart contract"
+    "smart contract",
+    "solidity"
   ],
   "dependencies": {
     "openzeppelin-solidity": "^2.3.0",
