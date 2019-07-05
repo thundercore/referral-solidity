@@ -37,12 +37,9 @@ jobs:
       - run:
           name: run test
           command: npm test 
-      - slack/notify:
+      - slack/status:
           fail_only: true
           color: '#42e2f4'
 #          mentions: 'USERID1,USERID2,'
           message: This is a custom message notification
 #          webhook: webhook
-
-orbs:
-  slack: circleci/slack@3.2.0
