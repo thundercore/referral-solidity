@@ -16,7 +16,7 @@ module.exports = {
     ExceedMaxReferreeLevelDepth: 'Exceeded max referree bonus level depth',
     TotalLevelRateOverflow: 'Total level rate exceeded 100%',
     ReferralRateOverflow: 'Referral bonus is exceeded 100%',
-    InvalidReferrer: 'Referrer cannot be 0x0 address',
+    InvalidReferrer: 'Referrer cannot be 0x0 address or self',
     DoubleRegisterReferrer: 'Address have been registered upline',
   },
 };

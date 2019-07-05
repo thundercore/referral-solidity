@@ -91,7 +91,7 @@ contract Referral is Ownable {
   }
 
   function addReferrer(address payable referrer) public {
-    require(referrer != address(0), "Referrer cannot be 0x0 address");
+    require(referrer != address(0) && referrer != msg.sender, "Referrer cannot be 0x0 address or self");
     require(accounts[msg.sender].referrer == address(0), "Address have been registered upline");
 
     Account storage userAccount = accounts[msg.sender];

@@ -110,6 +110,16 @@ contract("Referral", function(accounts) {
       );
     });
 
+    it("Should failed when add address self as referrer", async () => {
+      await expectRevert(
+        this.referral.addReferrer(accounts[1], {
+          from: accounts[1]
+        }),
+        errors.InvalidReferrer
+      );
+    });
+
+
     it("Should failed when an address double add referrer", async () => {
       await this.referral.addReferrer(accounts[0], {
         from: accounts[1]
