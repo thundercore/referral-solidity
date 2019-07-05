@@ -39,7 +39,4 @@ jobs:
           command: npm test 
       - slack/status:
           fail_only: true
-#          color: '#42e2f4'
-#          mentions: 'USERID1,USERID2,'
-#          message: This is a custom message notification
-          webhook: https://hooks.slack.com/services/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 
+          webhook: ${SLACK_WEBHOOK} 
