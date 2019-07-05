@@ -43,3 +43,6 @@ jobs:
 #          mentions: 'USERID1,USERID2,'
           message: This is a custom message notification
 #          webhook: webhook
+
+orbs:
+  slack: circleci/slack@3.2.0
