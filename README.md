@@ -14,18 +14,23 @@ npm install @thundercore/referral-solidity
 ```
 
 ### Usage
-To write your custom contracts, import ours and extend them through inheritance.
-
+To write your custom contracts, import ours lib and extend them through inheritance.
 
 ```solidity
 pragma solidity ^0.5.0;
 import '@thundercore/referral-solidity/contracts/Referral.sol';
 
 contracts YourGame is Referral {
-  constructor() Referral ([6000, 3000, 1000], 500, 10000, 24 * 60 * 60, true, [1, 10000]) public {
+  // Referral(decimals, referralBonus, secondsUntilInactive, onlyRewardActiveReferrers, levelRate, refereeBonusRateMap)
+  constructor() Referral (10000, 500, 1 days, true, [6000, 3000, 1000], [1, 10000]) public {
   }
 }
 
 ```
+
+## For example 
+
+
+## Parameters and Functions
 
 ## Contributing

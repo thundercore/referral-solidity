@@ -9,5 +9,5 @@ module.exports = function(deployer) {
   const levelRate = [8000, 2000];
   const refereeBonusRateMap = [1, decimals];
 
-  deployer.deploy(Referral, levelRate, referralBonus, decimals, secondsUntilInactive, onlyRewardActiveReferrers, refereeBonusRateMap);
+  deployer.deploy(Referral, decimals, referralBonus, secondsUntilInactive, onlyRewardActiveReferrers, levelRate, refereeBonusRateMap);
 };

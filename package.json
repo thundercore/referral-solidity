@@ -1,6 +1,6 @@
 {
   "name": "@thundercore/referral-solidity",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Solidity Referral Contract lib",
   "files": [
     "build",

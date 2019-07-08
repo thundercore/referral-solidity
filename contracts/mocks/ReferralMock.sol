@@ -10,14 +10,14 @@ contract ReferralMock is Referral {
   uint256 fakeTime;
 
   constructor(
-    uint256[] memory _levelRate,
-    uint _referralBonus,
     uint _decimals,
+    uint _referralBonus,
     uint _secondsUntilInactive,
     bool _onlyRewardActiveReferrers,
+    uint256[] memory _levelRate,
     uint256[] memory _refereeBonusRateMap
   )
-  Referral(_levelRate, _referralBonus, _decimals, _secondsUntilInactive, _onlyRewardActiveReferrers, _refereeBonusRateMap)
+  Referral(_decimals, _referralBonus, _secondsUntilInactive, _onlyRewardActiveReferrers, _levelRate, _refereeBonusRateMap)
     public
   // solium-disable-next-line no-empty-blocks
   {}

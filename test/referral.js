@@ -27,11 +27,11 @@ contract("Referral", function(accounts) {
     it("Should failed to deploy when levels is empty", async () => {
       await expectRevert(
         Referral.new(
-          [],
-          referralBonus,
           decimals,
+          referralBonus,
           secondsUntilInactive,
           onlyRewardActiveReferrers,
+          [],
           refereeBonusRateMap
         ),
         errors.MissLevelRate
@@ -41,11 +41,11 @@ contract("Referral", function(accounts) {
     it("Should failed to deploy when levels are too much", async () => {
       await expectRevert(
         Referral.new(
-          [new BN(4000), new BN(3000), new BN(2000), new BN(1000)],
-          referralBonus,
           decimals,
+          referralBonus,
           secondsUntilInactive,
           onlyRewardActiveReferrers,
+          [new BN(4000), new BN(3000), new BN(2000), new BN(1000)],
           refereeBonusRateMap
         ),
         errors.ExceedMaxLevelDepth
@@ -55,11 +55,11 @@ contract("Referral", function(accounts) {
     it("Should failed when total level rate is larger than 100%", async () => {
       await expectRevert(
         Referral.new(
-          [new BN(4000), new BN(4000), new BN(4000)],
-          referralBonus,
           decimals,
+          referralBonus,
           secondsUntilInactive,
           onlyRewardActiveReferrers,
+          [new BN(4000), new BN(4000), new BN(4000)],
           refereeBonusRateMap
         ),
         errors.TotalLevelRateOverflow
@@ -69,11 +69,11 @@ contract("Referral", function(accounts) {
     it("Should failed when referral bonus is larger than 100%", async () => {
       await expectRevert(
         Referral.new(
-          levelRate,
-          decimals.mul(new BN(2)),
           decimals,
+          decimals.mul(new BN(2)),
           secondsUntilInactive,
           onlyRewardActiveReferrers,
+          levelRate,
           refereeBonusRateMap
         ),
         errors.ReferralRateOverflow
@@ -83,11 +83,11 @@ contract("Referral", function(accounts) {
     it("Should failed when total referee rate is larger than 100%", async () => {
       await expectRevert(
         Referral.new(
-          levelRate,
-          referralBonus,
           decimals,
+          referralBonus,
           secondsUntilInactive,
           onlyRewardActiveReferrers,
+          levelRate,
           [new BN(1), decimals.mul(new BN(2))]
         ),
         errors.RefereeRateOverflow
@@ -98,11 +98,11 @@ contract("Referral", function(accounts) {
   describe("Add Referrer", function() {
     beforeEach(async () => {
       this.referral = await Referral.new(
-        levelRate,
-        referralBonus,
         decimals,
+        referralBonus,
         secondsUntilInactive,
         onlyRewardActiveReferrers,
+        levelRate,
         refereeBonusRateMap
       );
     });
@@ -166,11 +166,11 @@ contract("Referral", function(accounts) {
   describe("Pay Referral", function() {
     beforeEach(async () => {
       this.referral = await Referral.new(
-        levelRate,
-        referralBonus,
         decimals,
+        referralBonus,
         secondsUntilInactive,
         onlyRewardActiveReferrers,
+        levelRate,
         refereeBonusRateMap
       );
     });
@@ -299,11 +299,11 @@ contract("Referral", function(accounts) {
       this.date = new Date(DEFAULT_START_TIME);
 
       this.referral = await Referral.new(
-        levelRate,
-        referralBonus,
         decimals,
+        referralBonus,
         secondsUntilInactive,
         true,
+        levelRate,
         refereeBonusRateMap
       );
 
@@ -404,11 +404,11 @@ contract("Referral", function(accounts) {
   describe("Utils", function() {
     beforeEach(async () => {
       this.referral = await Referral.new(
-        levelRate,
-        referralBonus,
         decimals,
+        referralBonus,
         secondsUntilInactive,
         onlyRewardActiveReferrers,
+        levelRate,
         refereeBonusRateMap
       );
     });
