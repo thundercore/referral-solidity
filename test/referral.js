@@ -7,7 +7,7 @@ const {
   constants: helperConstants
 } = require("openzeppelin-test-helpers");
 const { expect } = require("chai");
-const Referral = artifacts.require("ReferralWithFakeTimeAndPayable");
+const Referral = artifacts.require("ReferralMock");
 
 const { constants, events, errors } = require("./constants");
 
@@ -120,7 +120,7 @@ contract("Referral", function(accounts) {
     });
 
 
-    it("Should failed when an address double add referrer", async () => {
+    it("Should failed when an address double added as referrer", async () => {
       await this.referral.addReferrer(accounts[0], {
         from: accounts[1]
       });
@@ -245,11 +245,13 @@ contract("Referral", function(accounts) {
 
       // check event
       expectEvent.inLogs(result.logs, events.paidReferral, {
+        from: accounts[2],
         to: accounts[0],
         amount: amount0,
         level: new BN(2)
       });
       expectEvent.inLogs(result.logs, events.paidReferral, {
+        from: accounts[2],
         to: accounts[1],
         amount: amount1,
         level: new BN(1)

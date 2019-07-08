@@ -22,17 +22,17 @@ contract Referral is Ownable {
   }
 
   event RegisteredReferer(address referee, address referrer);
-  event PaidReferral(address to, uint amount, uint level);
+  event PaidReferral(address from, address to, uint amount, uint level);
   event UpdatedUserLastActiveTime(address user, uint timestamp);
 
   mapping(address => Account) public accounts;
 
-  uint256[] public levelRate;
-  uint256 public referralBonus;
-  uint256 public decimals;
-  uint256 public secondsUntilInactive;
-  bool public onlyRewardActiveReferrers;
-  RefereeBonusRate[] public refereeBonusRateMap;
+  uint256[] levelRate;
+  uint256 referralBonus;
+  uint256 decimals;
+  uint256 secondsUntilInactive;
+  bool onlyRewardActiveReferrers;
+  RefereeBonusRate[] refereeBonusRateMap;
 
   constructor(
     uint256[] memory _levelRate,
@@ -90,7 +90,7 @@ contract Referral is Ownable {
     return rate;
   }
 
-  function addReferrer(address payable referrer) public {
+  function addReferrer(address payable referrer) internal {
     require(referrer != address(0) && referrer != msg.sender, "Referrer cannot be 0x0 address or self");
     require(accounts[msg.sender].referrer == address(0), "Address have been registered upline");
 
@@ -123,22 +123,22 @@ contract Referral is Ownable {
 
         totalReferal = totalReferal.add(c);
 
+        parentAccount.reward = parentAccount.reward.add(c);
         parent.transfer(c);
-        emit PaidReferral(parent, c, i + 1);
+        emit PaidReferral(msg.sender, parent, c, i + 1);
       }
 
       userAccount = parentAccount;
     }
 
-    accounts[msg.sender].lastActiveTimestamp = getTime();
+    updateActiveTimestamp(msg.sender);
     return totalReferal;
   }
 
   function updateActiveTimestamp(address user) internal {
-    Account storage userAccount = accounts[user];
-    userAccount.lastActiveTimestamp = getTime();
-
-    emit UpdatedUserLastActiveTime(user, userAccount.lastActiveTimestamp);
+    uint timestamp = getTime();
+    accounts[user].lastActiveTimestamp = timestamp;
+    emit UpdatedUserLastActiveTime(user, timestamp);
   }
 
   function setSecondsUntilInactive(uint _secondsUntilInactive) public onlyOwner {

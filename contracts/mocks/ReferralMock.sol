@@ -1,8 +1,13 @@
 pragma solidity ^0.5.0;
 
-import "./Referral.sol";
+import "../Referral.sol";
 
-contract ReferralWithFakeTimeAndPayable is Referral {
+/**
+ * @dev Mock time and payable function for test.
+ *
+ */
+
+contract ReferralMock is Referral {
   uint256 fakeTime;
 
   constructor(
