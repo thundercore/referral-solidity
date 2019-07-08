@@ -3,8 +3,7 @@ pragma solidity ^0.5.0;
 import "../Referral.sol";
 
 /**
- * @dev Mock time and payable function for test.
- *
+ * @dev Mock time and expose internal to public function for test.
  */
 
 contract ReferralMock is Referral {
@@ -31,7 +30,11 @@ contract ReferralMock is Referral {
     fakeTime = f;
   }
 
-  function play () public payable returns(uint256){
+  function play() public payable returns(uint256){
     return payReferral(msg.value);
+  }
+
+  function addUpline(address payable referrer) public {
+    addReferrer(referrer);
   }
 }

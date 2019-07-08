@@ -90,8 +90,27 @@ contract Referral is Ownable {
     return rate;
   }
 
+  function isCircularReference(address referrer, address referee) internal view returns(bool){
+    address parent = referrer;
+
+    for (uint i; i < levelRate.length; i++) {
+      if (parent == address(0)) {
+        break;
+      }
+
+      if (parent == referee) {
+        return true;
+      }
+
+      parent = accounts[parent].referrer;
+    }
+
+    return false;
+  }
+
   function addReferrer(address payable referrer) internal {
-    require(referrer != address(0) && referrer != msg.sender, "Referrer cannot be 0x0 address or self");
+    require(referrer != address(0), "Referrer cannot be 0x0 address");
+    require(!isCircularReference(referrer, msg.sender), "Referee cannot be one of referrer uplines");
     require(accounts[msg.sender].referrer == address(0), "Address have been registered upline");
 
     Account storage userAccount = accounts[msg.sender];

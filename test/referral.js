@@ -91,7 +91,7 @@ contract("Referral", function(accounts) {
     });
 
     it("Should success add referrer", async () => {
-      const result = await this.referral.addReferrer(accounts[0], {
+      const result = await this.referral.addUpline(accounts[0], {
         from: accounts[1]
       });
 
@@ -103,30 +103,42 @@ contract("Referral", function(accounts) {
 
     it("Should failed when add address 0x0 as referrer", async () => {
       await expectRevert(
-        this.referral.addReferrer(helperConstants.ZERO_ADDRESS, {
+        this.referral.addUpline(helperConstants.ZERO_ADDRESS, {
           from: accounts[1]
         }),
-        errors.InvalidReferrer
+        errors.Invalid0x0Referrer
       );
     });
 
     it("Should failed when add address self as referrer", async () => {
       await expectRevert(
-        this.referral.addReferrer(accounts[1], {
+        this.referral.addUpline(accounts[1], {
           from: accounts[1]
         }),
         errors.InvalidReferrer
       );
     });
 
-
-    it("Should failed when an address double added as referrer", async () => {
-      await this.referral.addReferrer(accounts[0], {
+    it("Should failed when circular referrence", async () => {
+      await this.referral.addUpline(accounts[0], {
         from: accounts[1]
       });
 
       await expectRevert(
-        this.referral.addReferrer(accounts[2], {
+        this.referral.addUpline(accounts[1], {
+          from: accounts[0]
+        }),
+        errors.InvalidReferrer
+      );
+    });
+
+    it("Should failed when an address double added as referrer", async () => {
+      await this.referral.addUpline(accounts[0], {
+        from: accounts[1]
+      });
+
+      await expectRevert(
+        this.referral.addUpline(accounts[2], {
           from: accounts[1]
         }),
         errors.DoubleRegisterReferrer
@@ -151,15 +163,15 @@ contract("Referral", function(accounts) {
        * refer seq 0 <- 1 <- 2
        *                 \ _ 3
        * */
-      await this.referral.addReferrer(accounts[0], {
+      await this.referral.addUpline(accounts[0], {
         from: accounts[1]
       });
 
-      await this.referral.addReferrer(accounts[1], {
+      await this.referral.addUpline(accounts[1], {
         from: accounts[2]
       });
 
-      await this.referral.addReferrer(accounts[1], {
+      await this.referral.addUpline(accounts[1], {
         from: accounts[3]
       });
 
@@ -203,15 +215,15 @@ contract("Referral", function(accounts) {
        * refer seq 0 <- 1 <- 2
        *                 \ _ 3
        * */
-      await this.referral.addReferrer(accounts[0], {
+      await this.referral.addUpline(accounts[0], {
         from: accounts[1]
       });
 
-      await this.referral.addReferrer(accounts[1], {
+      await this.referral.addUpline(accounts[1], {
         from: accounts[2]
       });
 
-      await this.referral.addReferrer(accounts[1], {
+      await this.referral.addUpline(accounts[1], {
         from: accounts[3]
       });
 
@@ -243,6 +255,12 @@ contract("Referral", function(accounts) {
       expect(await balanceTracker0.delta()).to.be.bignumber.equal(amount0);
       expect(await balanceTracker1.delta()).to.be.bignumber.equal(amount1);
 
+      // check state
+      const account0 = await this.referral.accounts.call(accounts[0]);
+      const account1 = await this.referral.accounts.call(accounts[1]);
+      expect(account0.reward).to.be.bignumber.equal(amount0);
+      expect(account1.reward).to.be.bignumber.equal(amount1);
+
       // check event
       expectEvent.inLogs(result.logs, events.paidReferral, {
         from: accounts[2],
@@ -272,7 +290,7 @@ contract("Referral", function(accounts) {
     });
 
     it("Check account referrer", async () => {
-      await this.referral.addReferrer(accounts[0], {
+      await this.referral.addUpline(accounts[0], {
         from: accounts[1]
       });
 
