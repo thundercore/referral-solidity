@@ -37,8 +37,6 @@ jobs:
       - run:
           name: run test
           command: npm test 
-#      - slack/notify:
-#          color: '#42e2f4'
-#          mentions: 'USERID1,USERID2,'
-#          message: This is a custom message notification
-#          webhook: webhook
+      - slack/status:
+          fail_only: true
+          webhook: ${SLACK_WEBHOOK} 
