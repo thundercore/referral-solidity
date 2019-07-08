@@ -44,12 +44,12 @@ contract Referral is Ownable {
   )
     public
   {
-    require (_levelRate.length > 0, "Referral level should be at least one");
-    require (_levelRate.length <= MAX_REFER_DEPTH, "Exceeded max referral level depth");
+    require(_levelRate.length > 0, "Referral level should be at least one");
+    require(_levelRate.length <= MAX_REFER_DEPTH, "Exceeded max referral level depth");
     require(_refereeBonusRateMap.length % 2 == 0, "Referee Bonus Rate Map should be pass as [<amount>, <rate>, ....]");
     require(_refereeBonusRateMap.length / 2 <= MAX_REFEREE_BONUS_LEVEL, "Exceeded max referree bonus level depth");
-    require (_referralBonus <= _decimals, "Referral bonus is exceeded 100%");
-    require (sum(_levelRate) <= _decimals, "Total level rate exceeded 100%");
+    require(_referralBonus <= _decimals, "Referral bonus exceeds 100%");
+    require(sum(_levelRate) <= _decimals, "Total level rate exceeds 100%");
 
     referralBonus = _referralBonus;
     decimals = _decimals;
@@ -57,8 +57,17 @@ contract Referral is Ownable {
     secondsUntilInactive = _secondsUntilInactive;
     onlyRewardActiveReferrers = _onlyRewardActiveReferrers;
 
-    // Cause we can't pass struct or nested array without enabling experimental ABIEncoderV2, use array to simulate it
+    // Set default referee amount rate as 1ppl -> 100% if rate map is empty.
+    if (_refereeBonusRateMap.length == 0) {
+      refereeBonusRateMap.push(RefereeBonusRate(1, decimals));
+      return;
+    }
+
     for (uint i; i < _refereeBonusRateMap.length; i += 2) {
+      if (_refereeBonusRateMap[i+1] > decimals) {
+        revert("One of referee bonus rate exceeds 100%");
+      }
+      // Cause we can't pass struct or nested array without enabling experimental ABIEncoderV2, use array to simulate it
       refereeBonusRateMap.push(RefereeBonusRate(_refereeBonusRateMap[i], _refereeBonusRateMap[i+1]));
     }
   }

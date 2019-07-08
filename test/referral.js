@@ -9,9 +9,12 @@ const {
 const { expect } = require("chai");
 const Referral = artifacts.require("ReferralMock");
 
-const { constants, events, errors } = require("./constants");
+const { constants, events, errors } = require("./utils/constants");
+require("./utils/Date");
 
 contract("Referral", function(accounts) {
+  const DEFAULT_START_TIME = "2019-01-01 00:00";
+
   const decimals = new BN(10000);
   const referralBonus = new BN(500);
   const secondsUntilInactive = new BN(24 * 60 * 60);
@@ -63,7 +66,7 @@ contract("Referral", function(accounts) {
       );
     });
 
-    it("Should failed when Referral bonus is larger than 100%", async () => {
+    it("Should failed when referral bonus is larger than 100%", async () => {
       await expectRevert(
         Referral.new(
           levelRate,
@@ -74,6 +77,20 @@ contract("Referral", function(accounts) {
           refereeBonusRateMap
         ),
         errors.ReferralRateOverflow
+      );
+    });
+
+    it("Should failed when total referee rate is larger than 100%", async () => {
+      await expectRevert(
+        Referral.new(
+          levelRate,
+          referralBonus,
+          decimals,
+          secondsUntilInactive,
+          onlyRewardActiveReferrers,
+          [new BN(1), decimals.mul(new BN(2))]
+        ),
+        errors.RefereeRateOverflow
       );
     });
   });
@@ -268,6 +285,113 @@ contract("Referral", function(accounts) {
         amount: amount0,
         level: new BN(2)
       });
+      expectEvent.inLogs(result.logs, events.paidReferral, {
+        from: accounts[2],
+        to: accounts[1],
+        amount: amount1,
+        level: new BN(1)
+      });
+    });
+  });
+
+  describe("Referral with active user mechanism", function() {
+    beforeEach(async () => {
+      this.date = new Date(DEFAULT_START_TIME);
+
+      this.referral = await Referral.new(
+        levelRate,
+        referralBonus,
+        decimals,
+        secondsUntilInactive,
+        true,
+        refereeBonusRateMap
+      );
+
+      await this.referral.setTime(this.date.getTimeAsSeconds());
+    });
+
+    it("No pay when referrer is never active.", async () => {
+      await this.referral.addUpline(accounts[0], {
+        from: accounts[1]
+      });
+
+      const value = ether("0.01");
+      const result = await this.referral.play.call({
+        from: accounts[1],
+        value
+      });
+
+      expect(result).to.be.bignumber.equals(new BN(0));
+    });
+
+    it("No pay when referrer is inactive", async () => {
+      await this.referral.updateUserActiveTime(accounts[0]);
+
+      await this.referral.addUpline(accounts[0], {
+        from: accounts[1]
+      });
+
+      await this.referral.setTime(this.date.addDays(2).getTimeAsSeconds());
+
+      const value = ether("0.01");
+      const result = await this.referral.play.call({
+        from: accounts[1],
+        value
+      });
+
+      expect(result).to.be.bignumber.equals(new BN(0));
+    });
+
+    it("Only active users can get referrer", async () => {
+      /**
+       * refer seq 0 <---- 1 <---- 2
+       *           ^       ^
+       *        outdated  dated
+       * */
+
+      await this.referral.addUpline(accounts[0], {
+        from: accounts[1]
+      });
+
+      await this.referral.addUpline(accounts[1], {
+        from: accounts[2]
+      });
+
+      await this.referral.updateUserActiveTime(accounts[0]);
+
+      await this.referral.setTime(this.date.addDays(2).getTimeAsSeconds());
+
+      await this.referral.updateUserActiveTime(accounts[1]);
+
+      const value = ether("1");
+      const amount0 = new BN(0);
+      const amount1 = value
+        .mul(referralBonus)
+        .div(decimals)
+        .mul(levelRate[0])
+        .div(decimals)
+        .mul(refereeBonusRateMap[1])
+        .div(decimals);
+
+      const balanceTracker0 = await balance.tracker(accounts[0]);
+      const balanceTracker1 = await balance.tracker(accounts[1]);
+
+      const result = await this.referral.play({
+        from: accounts[2],
+        value
+      });
+
+      // check balance
+      expect(await balanceTracker0.delta()).to.be.bignumber.equal(amount0);
+      expect(await balanceTracker1.delta()).to.be.bignumber.equal(amount1);
+
+      // check state
+      const account0 = await this.referral.accounts.call(accounts[0]);
+      const account1 = await this.referral.accounts.call(accounts[1]);
+      expect(account0.reward).to.be.bignumber.equal(amount0);
+      expect(account1.reward).to.be.bignumber.equal(amount1);
+
+      // check event
       expectEvent.inLogs(result.logs, events.paidReferral, {
         from: accounts[2],
         to: accounts[1],

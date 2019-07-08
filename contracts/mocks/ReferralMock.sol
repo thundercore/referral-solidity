@@ -37,4 +37,8 @@ contract ReferralMock is Referral {
   function addUpline(address payable referrer) public {
     addReferrer(referrer);
   }
+
+  function updateUserActiveTime (address user) public{
+    updateActiveTimestamp(user);
+  }
 }
