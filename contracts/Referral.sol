@@ -56,7 +56,7 @@ contract Referral is Ownable {
 
   /**
    * @param _decimals The base decimals for float calc, for example 1000
-   * @param _referralBonus The referral bonus rate, which will divide by decimals. For example, If you will like to set as 5%, it can set as 50 when decimals is 1000.
+   * @param _referralBonus The total referral bonus rate, which will divide by decimals. For example, If you will like to set as 5%, it can set as 50 when decimals is 1000.
    * @param _secondsUntilInactive The seconds that a user does not update will be seen as inactive.
    * @param _onlyRewardActiveReferrers The flag to enable not paying to inactive uplines.
    * @param _levelRate The bonus rate for each level, which will divide by decimals too. The max depth is MAX_REFER_DEPTH.
