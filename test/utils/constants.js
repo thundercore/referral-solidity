@@ -7,6 +7,7 @@ module.exports = {
   },
   events: {
     registeredReferer: 'RegisteredReferer',
+    registeredRefererFailed: 'RegisteredRefererFailed',
     paidReferral: 'PaidReferral',
     updatedUserLastActiveTime: 'UpdatedUserLastActiveTime'
   },

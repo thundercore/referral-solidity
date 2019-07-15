@@ -42,6 +42,7 @@ contract Referral is Ownable {
   }
 
   event RegisteredReferer(address referee, address referrer);
+  event RegisteredRefererFailed(address referee, address referrer, string reason);
   event PaidReferral(address from, address to, uint amount, uint level);
   event UpdatedUserLastActiveTime(address user, uint timestamp);
 
@@ -166,11 +167,19 @@ contract Referral is Ownable {
   /**
    * @dev Add an address as referrer
    * @param referrer The address would set as referrer of msg.sender
+   * @return whether success to add upline
    */
-  function addReferrer(address payable referrer) internal {
-    require(referrer != address(0), "Referrer cannot be 0x0 address");
-    require(!isCircularReference(referrer, msg.sender), "Referee cannot be one of referrer uplines");
-    require(accounts[msg.sender].referrer == address(0), "Address have been registered upline");
+  function addReferrer(address payable referrer) internal returns(bool){
+    if (referrer == address(0)) {
+      emit RegisteredRefererFailed(msg.sender, referrer, "Referrer cannot be 0x0 address");
+      return false;
+    } else if (isCircularReference(referrer, msg.sender)) {
+      emit RegisteredRefererFailed(msg.sender, referrer, "Referee cannot be one of referrer uplines");
+      return false;
+    } else if (accounts[msg.sender].referrer != address(0)) {
+      emit RegisteredRefererFailed(msg.sender, referrer, "Address have been registered upline");
+      return false;
+    }
 
     Account storage userAccount = accounts[msg.sender];
     Account storage parentAccount = accounts[referrer];
@@ -180,6 +189,7 @@ contract Referral is Ownable {
     parentAccount.referredCount = parentAccount.referredCount.add(1);
 
     emit RegisteredReferer(msg.sender, referrer);
+    return true;
   }
 
   /**

@@ -91,8 +91,8 @@ The map should be pass as [ `<lower amount>`, `<rate>`, ... ]. For example, you 
 
 #### Methods
 
-##### addReferrer(address payable referrer) -> void
-Add an address as `msg.sender`'s referrer.
+##### addReferrer(address payable referrer) -> bool
+Add an address as `msg.sender`'s referrer. When add referrer failed, it won\'t revert the transaction but emit `RegisteredRefererFailed` events and return false.
 
 ##### payReferral((uint256 value) -> uint256
 Calculate and pay referral to all of uplines instantly. The return is total tokens paid to uplines.
@@ -113,6 +113,10 @@ Update `onlyRewardActiveReferrers` after deployed.
 
 ##### RegisteredReferer(address referee, address referrer)
 Emitted when `referee` add `referrer` as upline.
+
+##### RegisteredRefererFailed(address referee, address referrer, string reason)
+Emitted when `referee` add `referrer` as upline failed.
+
 
 ##### PaidReferral(address from, address to, uint amount, uint level)
 Emitted when `from` trigger pay referral `amount` to `to`, which is `level` level referrer.

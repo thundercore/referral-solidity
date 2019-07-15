@@ -108,6 +108,12 @@ contract("Referral", function(accounts) {
     });
 
     it("Should success add referrer", async () => {
+      const call = await this.referral.addUpline.call(accounts[0], {
+        from: accounts[1]
+      });
+
+      expect(call).to.be.true;
+
       const result = await this.referral.addUpline(accounts[0], {
         from: accounts[1]
       });
@@ -116,24 +122,57 @@ contract("Referral", function(accounts) {
         referee: accounts[1],
         referrer: accounts[0]
       });
+
+      const account1 = await this.referral.accounts.call(accounts[1]);
+      expect(account1.referrer).to.be.equal(accounts[0]);
     });
 
     it("Should failed when add address 0x0 as referrer", async () => {
-      await expectRevert(
-        this.referral.addUpline(helperConstants.ZERO_ADDRESS, {
+      const call = await this.referral.addUpline.call(
+        helperConstants.ZERO_ADDRESS,
+        {
           from: accounts[1]
-        }),
-        errors.Invalid0x0Referrer
+        }
       );
+
+      expect(call).to.be.false;
+
+      const result = await this.referral.addUpline(
+        helperConstants.ZERO_ADDRESS,
+        {
+          from: accounts[1]
+        }
+      );
+
+      expectEvent.inLogs(result.logs, events.registeredRefererFailed, {
+        referee: accounts[1],
+        referrer: helperConstants.ZERO_ADDRESS,
+        reason: errors.Invalid0x0Referrer
+      });
+
+      const account1 = await this.referral.accounts.call(accounts[1]);
+      expect(account1.referrer).to.be.equal(helperConstants.ZERO_ADDRESS);
     });
 
     it("Should failed when add address self as referrer", async () => {
-      await expectRevert(
-        this.referral.addUpline(accounts[1], {
-          from: accounts[1]
-        }),
-        errors.InvalidReferrer
-      );
+      const call = await this.referral.addUpline.call(accounts[0], {
+        from: accounts[0]
+      });
+
+      expect(call).to.be.false;
+
+      const result = await this.referral.addUpline(accounts[0], {
+        from: accounts[0]
+      });
+
+      expectEvent.inLogs(result.logs, events.registeredRefererFailed, {
+        referee: accounts[0],
+        referrer: accounts[0],
+        reason: errors.InvalidReferrer
+      });
+
+      const account0 = await this.referral.accounts.call(accounts[0]);
+      expect(account0.referrer).to.be.equal(helperConstants.ZERO_ADDRESS);
     });
 
     it("Should failed when circular referrence", async () => {
@@ -141,12 +180,24 @@ contract("Referral", function(accounts) {
         from: accounts[1]
       });
 
-      await expectRevert(
-        this.referral.addUpline(accounts[1], {
-          from: accounts[0]
-        }),
-        errors.InvalidReferrer
-      );
+      const call = await this.referral.addUpline.call(accounts[1], {
+        from: accounts[0]
+      });
+
+      expect(call).to.be.false;
+
+      const result = await this.referral.addUpline(accounts[1], {
+        from: accounts[0]
+      });
+
+      expectEvent.inLogs(result.logs, events.registeredRefererFailed, {
+        referee: accounts[0],
+        referrer: accounts[1],
+        reason: errors.InvalidReferrer
+      });
+
+      const account0 = await this.referral.accounts.call(accounts[0]);
+      expect(account0.referrer).to.be.equal(helperConstants.ZERO_ADDRESS);
     });
 
     it("Should failed when an address double added as referrer", async () => {
@@ -154,12 +205,24 @@ contract("Referral", function(accounts) {
         from: accounts[1]
       });
 
-      await expectRevert(
-        this.referral.addUpline(accounts[2], {
-          from: accounts[1]
-        }),
-        errors.DoubleRegisterReferrer
-      );
+      const call = await this.referral.addUpline.call(accounts[2], {
+        from: accounts[1]
+      });
+
+      expect(call).to.be.false;
+
+      const result = await this.referral.addUpline(accounts[2], {
+        from: accounts[1]
+      });
+
+      expectEvent.inLogs(result.logs, events.registeredRefererFailed, {
+        referee: accounts[1],
+        referrer: accounts[2],
+        reason: errors.DoubleRegisterReferrer
+      });
+
+      const account1 = await this.referral.accounts.call(accounts[1]);
+      expect(account1.referrer).to.be.equal(accounts[0]);
     });
   });
 

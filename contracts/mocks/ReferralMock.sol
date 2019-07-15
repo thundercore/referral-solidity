@@ -34,8 +34,8 @@ contract ReferralMock is Referral {
     return payReferral(msg.value);
   }
 
-  function addUpline(address payable referrer) public {
-    addReferrer(referrer);
+  function addUpline(address payable referrer) public returns(bool){
+    return addReferrer(referrer);
   }
 
   function updateUserActiveTime (address user) public{
