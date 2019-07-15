@@ -12,6 +12,8 @@ The current version supports:
 - only active user get referral bonus
 - pay instantly when downline joins
 
+There is tutorial and example at [here](https://developers.thundercore.com/docs/referral-contract).
+
 ## Get Started
 
 ### Install
