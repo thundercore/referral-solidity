@@ -200,6 +200,8 @@ contract Referral is Ownable {
   function payReferral(uint256 value) internal returns(uint256){
     Account memory userAccount = accounts[msg.sender];
     uint totalReferal;
+    
+    uint c = value.mul(referralBonus).div(decimals);
 
     for (uint i; i < levelRate.length; i++) {
       address payable parent = userAccount.referrer;
@@ -210,7 +212,6 @@ contract Referral is Ownable {
       }
 
       if(onlyRewardActiveReferrers && parentAccount.lastActiveTimestamp.add(secondsUntilInactive) >= getTime() || !onlyRewardActiveReferrers) {
-        uint c = value.mul(referralBonus).div(decimals);
         c = c.mul(levelRate[i]).div(decimals);
         c = c.mul(getRefereeBonusRate(parentAccount.referredCount)).div(decimals);
 
